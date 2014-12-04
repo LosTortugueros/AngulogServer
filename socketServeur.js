@@ -23,9 +23,17 @@ var socketClient = [];
 var allMyData;
 
 io.sockets.on('connection', function (socket) {
-    socket.emit(allMyData);
+    sendData();
     socketClient.push(socket);
 });
+
+function sendData(){
+    for (var attribute in socketClient)
+        socketClient[attribute].emit('allData',allMyData);
+    setTimeout('sendData',5000);
+
+}
+
 
 server.listen(3000);
 
