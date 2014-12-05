@@ -15,6 +15,9 @@ var currentRame = [];
 var currentClicks = [];
 var currentNbreClick = 0;
 
+var currentToutch = [];
+var currentNbreToutch = 0;
+
 var nbreClickJules = 0;
 var nbreClickTristan = 0;
 var nbreClickHugo = 0;
@@ -24,19 +27,42 @@ var nbreClickMick = 0;
 var nbreClickDavid = 0;
 var nbreClickJerem = 0;
 
+var nbreToutchJules = 0;
+var nbreToutchTristan = 0;
+var nbreToutchHugo = 0;
+var nbreToutchSeb = 0;
+var nbreToutchMel = 0;
+var nbreToutchMick = 0;
+var nbreToutchDavid = 0;
+var nbreToutchJerem = 0;
+
 
 var express = require('express');
 var app = express();
 
 app.get('/david/click', function (req, res) {
-   var clicksAll = {"jules":nbreClickJules,
-       "mickael":nbreClickMick,
-       "hugo":nbreClickHugo,
-       "jeremie":nbreClickJerem,
-       "sebastien":nbreClickSeb,
-       "melina":nbreClickMel,
-       "david":nbreClickDavid,
-       "tristan":nbreClickTristan};
+   var clicksAll = [{"pseudo":"jules","click":nbreClickJules},
+       {"pseudo":"micka","click":nbreClickMick},
+       {"pseudo":"hugo","click":nbreClickHugo},
+       {"pseudo":"jerem","click":nbreClickJerem},
+       {"pseudo":"seb","click":nbreClickSeb},
+       {"pseudo":"melina","click":nbreClickMel},
+       {"pseudo":"david","click":nbreClickDavid},
+       {"pseudo":"tristan","click":nbreClickTristan}];
+
+    res.send(clicksAll);
+    //nbreClickDavid = 0
+});
+
+app.get('/david/toutch', function (req, res) {
+    var clicksAll = [{"pseudo":"jules","click":nbreToutchJules},
+        {"pseudo":"micka","click":nbreToutchMick},
+        {"pseudo":"hugo","click":nbreToutchHugo},
+        {"pseudo":"jerem","click":nbreToutchJerem},
+        {"pseudo":"seb","click":nbreToutchSeb},
+        {"pseudo":"melina","click":nbreToutchMel},
+        {"pseudo":"david","click":nbreToutchDavid},
+        {"pseudo":"tristan","click":nbreToutchTristan}];
 
     res.send(clicksAll);
     //nbreClickDavid = 0
@@ -71,7 +97,68 @@ var fillClick = function(){
     getClickFromUrl(urlDavid,"david");
 
     getClickFromUrl(urlMickael,"mick");
+
+    getTouchFromUrl(urlJules,"jules");
+
+    getTouchFromUrl(urlHugo,"hugo");
+
+    getTouchFromUrl(urlTristan,"tristan");
+
+    getTouchFromUrl(urlSebastien,"seb");
+
+    getTouchFromUrl(urljeremie,"jerem");
+
+    getTouchFromUrl(urlMelina,"mel");
+
+    getTouchFromUrl(urlDavid,"david");
+
+    getTouchFromUrl(urlMickael,"mick");
+
 }
+
+var getTouchFromUrl = function(url,username){
+    var request = require("request");
+    request(url, function(error, response, body){
+        currentNbreToutch = 0;
+        currentToutch = [];
+        var jsonUser = JSON.parse(body.toString());
+
+        var lastTimeMs = 0;
+        var actualTimeMs = 0;
+
+        for(var attribute in jsonUser){
+            if(jsonUser[attribute].hasOwnProperty("keys")){
+                for (var att in jsonUser[attribute]["keys"]) {
+                    actualTimeMs = jsonUser[attribute]["keys"][att];
+                    currentNbreToutch++;
+                    if((actualTimeMs-lastTimeMs) > 240) {
+                        lastTimeMs = jsonUser[attribute]["keys"][att];
+                        currentToutch.push({"keys":jsonUser[attribute]["keys"][att],"toutchNumber":currentNbreToutch});
+                    }
+                }
+            }
+        }
+        if(username == "jules"){
+            nbreToutchJules = currentNbreToutch;
+        }else if(username == "david"){
+            nbreToutchDavid = currentNbreToutch;
+        }else if(username == "jerem"){
+            nbreToutchJerem= currentNbreToutch;
+        }else if(username == "mel"){
+            nbreToutchMel = currentNbreToutch;
+        }else if(username == "hugo"){
+            nbreToutchHugo = currentNbreToutch;
+        }else if(username == "seb"){
+            nbreToutchSeb = currentNbreToutch;
+        }else if(username == "tristan"){
+            nbreToutchTristan = currentNbreToutch;
+        }else if(username == "mick"){
+            nbreToutchMick = currentNbreToutch;
+        }else{
+
+        }
+    });
+};
 
 var getClickFromUrl = function(url,username){
     var request = require("request");
