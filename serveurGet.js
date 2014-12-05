@@ -18,6 +18,9 @@ var currentNbreClick = 0;
 var currentToutch = [];
 var currentNbreToutch = 0;
 
+var currentDistance = [];
+var currentNbreDistance = 0;
+
 var nbreClickJules = 0;
 var nbreClickTristan = 0;
 var nbreClickHugo = 0;
@@ -36,6 +39,14 @@ var nbreToutchMick = 0;
 var nbreToutchDavid = 0;
 var nbreToutchJerem = 0;
 
+var nbreDistanceJules = 0;
+var nbreDistanceTristan = 0;
+var nbreDistanceHugo = 0;
+var nbreDistanceSeb = 0;
+var nbreDistanceMel = 0;
+var nbreDistanceMick = 0;
+var nbreDistanceDavid = 0;
+var nbreDistanceJerem = 0;
 
 var express = require('express');
 var app = express();
@@ -68,6 +79,33 @@ app.get('/david/toutch', function (req, res) {
     //nbreClickDavid = 0
 });
 
+app.get('/david/distance', function (req, res) {
+    var clicksAll = [{"pseudo":"jules","click":nbreDistanceJules},
+        {"pseudo":"micka","click":nbreDistanceMick},
+        {"pseudo":"hugo","click":nbreDistanceHugo},
+        {"pseudo":"jerem","click":nbreDistanceJerem},
+        {"pseudo":"seb","click":nbreDistanceSeb},
+        {"pseudo":"melina","click":nbreDistanceMel},
+        {"pseudo":"david","click":nbreDistanceDavid},
+        {"pseudo":"tristan","click":nbreDistanceTristan}];
+
+    res.send(clicksAll);
+    //nbreClickDavid = 0
+});
+
+app.get('/david/boisson', function (req, res) {
+    var clicksAll = [{"boisson":"the","nom":boisson[0]},
+        {"boisson":"coca","nom":boisson[1]},
+        {"boisson":"cafe","nom":boisson[2]},
+        {"boisson":"soda","nom":boisson[3]},
+        {"boisson":"autre","nom":boisson[4]},
+        {"boisson":"eau","nom":boisson[5]},
+        {"boisson":"total","nom":boisson[8]}];
+
+    res.send(clicksAll);
+    //nbreClickDavid = 0
+});
+
 var server;
 server = app.listen(3000, function () {
 
@@ -82,46 +120,104 @@ server = app.listen(3000, function () {
 });
 
 var fillClick = function(){
-    /*getClickFromUrl(urlJules,"jules");
 
-    getClickFromUrl(urlHugo,"hugo");
+    getBoisson();
 
-    getClickFromUrl(urlTristan,"tristan");
+    //getClickFromUrl(urlJules,"jules");
 
-    getClickFromUrl(urlSebastien,"seb");
+   // getClickFromUrl(urlHugo,"hugo");
 
-    getClickFromUrl(urljeremie,"jerem");
+    //getClickFromUrl(urlTristan,"tristan");
 
-    getClickFromUrl(urlMelina,"mel");
+    // getClickFromUrl(urlSebastien,"seb");
 
-    getClickFromUrl(urlDavid,"david");
+    //getClickFromUrl(urljeremie,"jerem");
 
-    getClickFromUrl(urlMickael,"mick");*/
+    //getClickFromUrl(urlMelina,"mel");
 
-    getTouchFromUrl(urlJules,"jules");
+   // getClickFromUrl(urlDavid,"david");
 
-    getTouchFromUrl(urlHugo,"hugo");
+    //getClickFromUrl(urlMickael,"mick");
 
-    getTouchFromUrl(urlTristan,"tristan");
+    //  getTouchFromUrl(urlJules,"jules");
 
-    getTouchFromUrl(urlSebastien,"seb");
+   // getTouchFromUrl(urlHugo,"hugo");
 
-    getTouchFromUrl(urljeremie,"jerem");
+   // getTouchFromUrl(urlTristan,"tristan");
 
-    getTouchFromUrl(urlMelina,"mel");
+    //  getTouchFromUrl(urlSebastien,"seb");
 
-    getTouchFromUrl(urlDavid,"david");
+   // getTouchFromUrl(urljeremie,"jerem");
 
-    getTouchFromUrl(urlMickael,"mick");
+   // getTouchFromUrl(urlMelina,"mel");
+
+    //getTouchFromUrl(urlDavid,"david");
+
+   // getTouchFromUrl(urlMickael,"mick");
+
+    // getDistanceFromUrl(urlJules,"jules");
+
+    //getDistanceFromUrl(urlHugo,"hugo");
+
+   // getDistanceFromUrl(urlTristan,"tristan");
+
+    //  getDistanceFromUrl(urlSebastien,"seb");
+
+  //  getDistanceFromUrl(urljeremie,"jerem");
+
+    //getDistanceFromUrl(urlMelina,"mel");
+
+    //getDistanceFromUrl(urlDavid,"david");
+
+    //getDistanceFromUrl(urlMickael,"mick");
 
 }
+
+var getDistanceFromUrl = function(url,username){
+    var request = require("request");
+    request(url, function(error, response, body){
+        currentNbreDistance = 0;
+        currentDistance = [];
+        var jsonUser = JSON.parse(body);
+
+        var lastTimeMs = 0;
+        var actualTimeMs = 0;
+
+        for(var attribute in jsonUser) {
+            if (jsonUser[attribute].hasOwnProperty("distance")) {
+                currentNbreDistance = currentNbreDistance + jsonUser[attribute]["distance"];
+                   // lastTimeMs = jsonUser[attribute]["keys"][att];
+                   // currentToutch.push({"keys": jsonUser[attribute]["keys"][att], "toutchNumber": currentNbreToutch});
+            }
+        }
+        if(username == "jules"){
+            nbreDistanceJules = currentNbreDistance;
+        }else if(username == "david"){
+            nbreDistanceDavid = currentNbreDistance;
+        }else if(username == "jerem"){
+            nbreDistanceJerem= currentNbreDistance;
+        }else if(username == "mel"){
+            nbreDistanceMel = currentNbreDistance;
+        }else if(username == "hugo"){
+            nbreDistanceHugo = currentNbreDistance;
+        }else if(username == "seb"){
+            nbreDistanceSeb = currentNbreDistance;
+        }else if(username == "tristan"){
+            nbreDistanceTristan = currentNbreDistance;
+        }else if(username == "mick"){
+            nbreDistanceMick = currentNbreDistance;
+        }else{
+
+        }
+    });
+};
 
 var getTouchFromUrl = function(url,username){
     var request = require("request");
     request(url, function(error, response, body){
         currentNbreToutch = 0;
         currentToutch = [];
-        var jsonUser = JSON.parse(body.toString());
+        var jsonUser = JSON.parse(body);
 
         var lastTimeMs = 0;
         var actualTimeMs = 0;
@@ -165,7 +261,7 @@ var getClickFromUrl = function(url,username){
     request(url, function(error, response, body){
         currentNbreClick = 0;
         currentClicks = [];
-        var jsonUser = JSON.parse(body.toString());
+        var jsonUser = JSON.parse(body);
 
         var lastTimeMs = 0;
         var actualTimeMs = 0;
@@ -203,3 +299,89 @@ var getClickFromUrl = function(url,username){
         }
     });
 };
+
+var total = 0;
+
+var the = 0;
+var coca = 0;
+var cafe = 0;
+var soda = 0;
+var autre = 0;
+var eau = 0;
+var biere = 0;
+var redbull = 0;
+
+var boisson = [the,coca,cafe,soda,autre,eau,biere,redbull,total];
+var name = ["the","coca","cafe","soda","autre","eau","biere","redbull","total"]
+
+var getBoisson = function(){
+
+    var table = [urlDavid,urlHugo,urljeremie,urlJules,urlMelina,urlMickael,urlSebastien,urlTristan];
+
+    for (var attribute in table){
+        //console.log("enter table:" +table[attribute]);
+
+        var request = require("request");
+
+        request(table[attribute], function(error, response, body) {
+
+            var jsonUser = JSON.parse(body);
+            // console.log("hello");
+            for (var attribute in jsonUser) {
+                // console.log("enter json:" + jsonUser[attribute]);
+
+                if ((jsonUser[attribute].hasOwnProperty("capteur")) && (jsonUser[attribute]["capteur"] == "boisson")) {
+                    boisson[8]++;
+                    // console.log(jsonUser[attribute]["value"]);
+                    if (jsonUser[attribute]["value"] == "the") {
+
+                        boisson[0]++
+                        //console.log(the);
+                    }
+                    if (jsonUser[attribute]["value"] == "coca") {
+
+                        boisson[1]++
+                        //console.log(coca);
+                    }
+                    if (jsonUser[attribute]["value"] == "cafe") {
+
+                        boisson[2]++
+                        // console.log(soda);
+                    }
+                    if (jsonUser[attribute]["value"] == "soda") {
+
+                        boisson[3]++
+                    }
+                    if (jsonUser[attribute]["value"] == "autre") {
+
+                        boisson[4]++
+                    }
+                    if (jsonUser[attribute]["value"] == "eau") {
+
+                        boisson[5]++
+                    }
+                    if (jsonUser[attribute]["value"] == "biere") {
+                        boisson[6]++
+                    }
+                    if (jsonUser[attribute]["value"] == "redbull") {
+                        boisson[7]++
+                    }
+                }
+
+            }
+           // console.log();
+           // console.log();
+            console.log("result:");
+           // console.log();
+
+            for (var i = 0; i<9;  i++) {
+               // console.log(name[i] + "% : " + boisson[i]/boisson[8]*100);
+            }
+
+        });
+
+    }
+
+}
+
+getBoisson();
