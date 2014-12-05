@@ -82,7 +82,7 @@ server = app.listen(3000, function () {
 });
 
 var fillClick = function(){
-    getClickFromUrl(urlJules,"jules");
+    /*getClickFromUrl(urlJules,"jules");
 
     getClickFromUrl(urlHugo,"hugo");
 
@@ -96,7 +96,7 @@ var fillClick = function(){
 
     getClickFromUrl(urlDavid,"david");
 
-    getClickFromUrl(urlMickael,"mick");
+    getClickFromUrl(urlMickael,"mick");*/
 
     getTouchFromUrl(urlJules,"jules");
 
