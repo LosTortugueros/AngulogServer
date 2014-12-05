@@ -10,17 +10,21 @@ var server = http.createServer(function(req, res) {
     fs.readFile('./index.html', 'utf-8', function(error, content) {
         getClickFromUrl(urlDavid);
         getRamFromUrl(urlDavid);
+        mergeAllData();
         res.writeHead(200, {"Content-Type": "text/html"});
         res.end(content);
     });
 });
 
+
 // Chargement de socket.io
 var io = require('socket.io').listen(server);
 
+server.listen(3000);
+
 var socketClient = [];
 
-var allMyData;
+var allMyData = [];
 
 io.sockets.on('connection', function (socket) {
     sendData();
@@ -28,22 +32,26 @@ io.sockets.on('connection', function (socket) {
 });
 
 function sendData(){
-    for (var attribute in socketClient)
+    getClickFromUrl(urlDavid,davidClicks);
+    getRamFromUrl(urlJules,julesRame);
+    mergeAllData();
+
+    for (var attribute in socketClient){
         socketClient[attribute].emit('allData',allMyData);
-    setTimeout('sendData',5000);
+       // console.log(davidRame);
+    }
+
+    setTimeout(sendData,3000);
 
 }
 
-
-server.listen(3000);
-
 var express = require('express')
 var app = express()
-var nbreClickDavid = 0;
 
 var urlDavid = "http://etud.insa-toulouse.fr/~livet/ServerLogger/david.json"
 var davidRame = [];
 var davidClicks = [];
+var nbreClickDavid = 0;
 
 var urlJules = "http://etud.insa-toulouse.fr/~livet/ServerLogger/jules.json"
 var julesRame = [];
@@ -66,37 +74,62 @@ var sebastienRame = [];
 var urlMickael = "http://etud.insa-toulouse.fr/~livet/ServerLogger/mickael.json"
 var mickaelRame = [];
 
-var getRamFromUrl = function(url){
+var calcDiffMs = function(tim1, tim2){
+    return (tim1-tim2);
+}
+
+var getRamFromUrl = function(url,userName){
     var request = require("request");
     request(url, function(error, response, body){
-        var jsonDavid = JSON.parse(body);
-
-        for(var attribute in jsonDavid){
+        var jsonUser = JSON.parse(body);
+        var lastTimeMs = 0;
+        var actualTimeMs = 0;
+        userName = [];
+        for(var attribute in jsonUser){
             var ramTrouve = false;
-            if(jsonDavid[attribute].hasOwnProperty("ram")){
+            if(jsonUser[attribute].hasOwnProperty("ram")){
                 ramTrouve = true;
+                actualTimeMs = jsonUser[attribute]["time"];
             }
 
             if(ramTrouve){
-                davidRame.push({"ram":jsonDavid[attribute]["ram"],"time":jsonDavid[attribute]["time"]})
-                //console.log(davidRame);
-            }
-        }
-    });
-};
-
-var getClickFromUrl = function(url){
-    var request = require("request");
-    request(url, function(error, response, body){
-        var jsonDavid = JSON.parse(body);
-        for(var attribute in jsonDavid){
-            if(jsonDavid[attribute].hasOwnProperty("clicks")){
-                for( var att in jsonDavid[attribute]["clicks"]) {
-                    nbreClickDavid++;
-                    davidClicks.push(jsonDavid[attribute]["clicks"][att]);
+               // console.log(calcDiffMs(actualTimeMs,lastTimeMs));
+                if(calcDiffMs(actualTimeMs,lastTimeMs)> 240){
+                    lastTimeMs = jsonUser[attribute]["time"];
+                    userName.push({"ram":jsonUser[attribute]["ram"],"time":jsonUser[attribute]["time"]});
                 }
             }
         }
     });
 };
 
+var getClickFromUrl = function(url,userClicks){
+    var request = require("request");
+    request(url, function(error, response, body){
+        userClicks = [];
+        var jsonUser = JSON.parse(body);
+
+        var lastTimeMs = 0;
+        var actualTimeMs = 0;
+
+        for(var attribute in jsonUser){
+            if(jsonUser[attribute].hasOwnProperty("clicks")){
+
+                    for (var att in jsonUser[attribute]["clicks"]) {
+                        nbreClickDavid++;
+                        if(calcDiffMs(actualTimeMs,lastTimeMs)> 240) {
+                            lastTimeMs = jsonUser[attribute]["time"];
+                            userClicks.push({"clicks":jsonUser[attribute]["clicks"][att],"clickNumber":nbreClickDavid});
+                            console.log(jsonUser[attribute]["time"]);
+                        }
+                }
+            }
+        }
+    });
+};
+
+var mergeAllData = function(){
+    //allMyData = davidRame;
+    allMyData.push(davidRame);
+    allMyData.push(davidClicks)
+};

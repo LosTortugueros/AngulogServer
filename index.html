@@ -10,10 +10,12 @@
 
     var socket = io.connect();
 
-    var allMyData;
+    var allMyData = [];
 
-    socket.on('allData', function(x) {
-        allMyData = x;
+    socket.on('allData', function(json) {
+
+        allMyData = json;
+        alert(json);
     });
 
 </script>
