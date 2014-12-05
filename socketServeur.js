@@ -32,7 +32,7 @@ io.sockets.on('connection', function (socket) {
 });
 
 function sendData(){
-    getClickFromUrl(urlDavid,davidClicks);
+    getClickFromUrl(urlDavid,davidClicks,nbreClickDavid);
     getRamFromUrl(urlJules,julesRame);
     mergeAllData();
 
@@ -84,6 +84,8 @@ var getRamFromUrl = function(url,userName){
         var jsonUser = JSON.parse(body);
         var lastTimeMs = 0;
         var actualTimeMs = 0;
+        var sommeLastRam = 0;
+        var nombreTourSansAdd = 0;
         userName = [];
         for(var attribute in jsonUser){
             var ramTrouve = false;
@@ -93,20 +95,25 @@ var getRamFromUrl = function(url,userName){
             }
 
             if(ramTrouve){
-               // console.log(calcDiffMs(actualTimeMs,lastTimeMs));
+                sommeLastRam = sommeLastRam + jsonUser[attribute]["ram"];
                 if(calcDiffMs(actualTimeMs,lastTimeMs)> 240){
+                    var q = sommeLastRam/nombreTourSansAdd;
                     lastTimeMs = jsonUser[attribute]["time"];
-                    userName.push({"ram":jsonUser[attribute]["ram"],"time":jsonUser[attribute]["time"]});
+                    userName.push({"ram":q,"time":jsonUser[attribute]["time"]});
+                    nombreTourSansAdd = 0;
+                }else{
+                    nombreTourSansAdd++;
                 }
             }
         }
     });
 };
 
-var getClickFromUrl = function(url,userClicks){
+var getClickFromUrl = function(url,userClicks,nbreClick){
     var request = require("request");
     request(url, function(error, response, body){
         userClicks = [];
+        nbreClick = 0;
         var jsonUser = JSON.parse(body);
 
         var lastTimeMs = 0;
@@ -114,13 +121,15 @@ var getClickFromUrl = function(url,userClicks){
 
         for(var attribute in jsonUser){
             if(jsonUser[attribute].hasOwnProperty("clicks")){
-
+                actualTimeMs = jsonUser[attribute]["time"];
                     for (var att in jsonUser[attribute]["clicks"]) {
-                        nbreClickDavid++;
+                        nbreClick++;
+                        console.log(calcDiffMs(actualTimeMs,lastTimeMs));
                         if(calcDiffMs(actualTimeMs,lastTimeMs)> 240) {
                             lastTimeMs = jsonUser[attribute]["time"];
-                            userClicks.push({"clicks":jsonUser[attribute]["clicks"][att],"clickNumber":nbreClickDavid});
-                            console.log(jsonUser[attribute]["time"]);
+                            userClicks.push({"clicks":jsonUser[attribute]["clicks"][att],"clickNumber":nbreClick});
+                           // console.log(jsonUser[attribute]["time"]);
+                            console.log(nbreClick);
                         }
                 }
             }
